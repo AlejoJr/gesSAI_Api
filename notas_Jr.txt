@@ -1,0 +1,22 @@
+    for sai in sais:
+        print('SAI: '+ sai.name_sai)
+        url_sai = sai.url.replace('http://', '').replace('https://', '')
+
+        if sai.name_sai == 'SAI1F':
+            level = batteryLevel(url_sai, sai.code_oid)
+        else: level = 80
+
+        if level == 100:
+            sai.state = 'Busy'
+            sai.save()
+            localtime1 = time.localtime()
+            result = time.strftime("%I:%M:%S %p", localtime1)
+            print('Actualizado a las '+result +' --> esperamos 3 minutos.')
+            time.sleep(180)
+            localtime2 = time.localtime()
+            result2 = time.strftime("%I:%M:%S %p", localtime2)
+            print('pasaron los 3 minutos. Son las: '+result2)
+        else:
+            localtime = time.localtime()
+            result = time.strftime("%I:%M:%S %p", localtime)
+            print('Este es el sai 2 HORA--> '+ result)
