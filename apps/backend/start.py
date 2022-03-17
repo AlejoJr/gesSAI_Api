@@ -14,7 +14,7 @@ django.setup()
 
 from apps.sai.models import Sai
 from apps.pool.models import Pool
-if __name__ == '__main__':
+if __name__ == '__main__': #<--- esto permite ejecutar el archivo
     print("Inicio")
 
 

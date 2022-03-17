@@ -1,4 +1,6 @@
 from django.db import models
+from apps.sai.models import Sai
+from apps.user.models import User
 
 from apps.backend.hipervisor_api.xenapi import conection
 
@@ -14,6 +16,8 @@ class Pool(models.Model):
     url = models.URLField(null=True, blank=True)
     username = models.CharField(max_length=100, null=True)
     type = models.CharField(max_length=1, null=False)
+    user = models.ForeignKey(User, related_name='pool', on_delete=models.CASCADE)
+    sais = models.ManyToManyField(Sai, related_name='sais_pools')#<- Un POOL puede tener muchos SAIS y un SAI puede tener muchos POOLS
 
     class Meta:
         db_table = 'POOL'

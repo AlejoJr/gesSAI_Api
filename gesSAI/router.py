@@ -3,10 +3,10 @@ from rest_framework.routers import SimpleRouter
 from django.urls import path
 
 from apps.group.api.resources import GroupViewSet
-from apps.host.api.resources import HostViewSet, getHost_ExistMachineView, getHostsByGroup, getMasterHosts
-from apps.pool.api.resources import PoolViewSet
-from apps.sai.api.resources import SaiViewSet
-from apps.user.api.resources import UserViewSet, LDAPLogin
+from apps.host.api.resources import HostViewSet, getHost_ExistMachineView, getHostsByGroup, getMasterHosts, getHostsOfMasterHost, getAllHostsInAGroup,getHostByName
+from apps.pool.api.resources import PoolViewSet, syncPool
+from apps.sai.api.resources import SaiViewSet, tryConnectionSAI
+from apps.user.api.resources import UserViewSet, LoginGessai
 from apps.virtual_machine.api.resources import VirtualMachineViewSet, getVirtualMachinesView
 
 router = SimpleRouter()
@@ -18,11 +18,16 @@ router.register(r'virtualmachine', VirtualMachineViewSet, basename='VirtualMachi
 router.register(r'groups', GroupViewSet, basename='Group')
 
 urlpatterns = [
-    path('login', LDAPLogin.as_view()),
+    path('login', LoginGessai.as_view()),
     path('host/exists-machine/', getHost_ExistMachineView.as_view()),
     path('group/hosts/', getHostsByGroup.as_view()),
     path('hosts-master/', getMasterHosts.as_view()),
+    path('hosts-pool/', getHostsOfMasterHost.as_view()),
+    path('connection-sai/', tryConnectionSAI.as_view()),
+    path('machinesInGroup/', getAllHostsInAGroup.as_view()),
+    path('existsMachineByNameHost/', getHostByName.as_view()),
     path('pool/<int:id_pool>/virtualmachines/', getVirtualMachinesView.as_view()),
+    path('sync-pool/', syncPool.as_view())
 ]
 
 urlpatterns += router.urls

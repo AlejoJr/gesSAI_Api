@@ -11,7 +11,7 @@ def conection(url, user, hipervisor_type):
         if hipervisor_type == 'X':
             session = XenAPI.Session(url)
             session.login_with_password(user, password)
-            print(session._session)
+            print('Session Ref: ' + session._session)
             return session
 
         # Conexion Ovirt

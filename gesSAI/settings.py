@@ -95,7 +95,7 @@ WSGI_APPLICATION = 'gesSAI.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'dbgessai',
+        'NAME': 'bdgessai',
         'USER': 'root',
         'PASSWORD': 'd1n4m1kjr',  # get_env_setting('DB_MYSQL_PASSWORD'),
         'HOST': 'localhost',
@@ -152,12 +152,13 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_USER_MODEL = 'user.User'
 
 ########################################################################################################################
 # LDAP Authentication Settings
 ########################################################################################################################
 
-LDAP_SERVER = 'upvnet.upv.es'
+"""LDAP_SERVER = 'upvnet.upv.es'
 AUTH_LDAP_SERVER_URI = 'ldaps://' + LDAP_SERVER
 AUTH_LDAP_BIND_DN = 'agregar'
 AUTH_LDAP_BIND_PASSWORD = 'agregar'
@@ -178,7 +179,7 @@ AUTH_LDAP_GLOBAL_OPTIONS = {
     ldap.OPT_X_TLS_REQUIRE_CERT: False,
     ldap.OPT_REFERRALS: False,
 }
-
+"""
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
