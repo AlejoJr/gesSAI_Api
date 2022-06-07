@@ -3,6 +3,9 @@ from apps.sai.models import Sai
 from apps.user.models import User
 
 from apps.backend.hipervisor_api.xenapi import conection
+from apps.backend.utils import get_env_setting
+
+import cryptocode
 
 
 # Create your models here.
@@ -15,6 +18,7 @@ class Pool(models.Model):
     ip = models.GenericIPAddressField(null=True)
     url = models.URLField(null=True, blank=True)
     username = models.CharField(max_length=100, null=True)
+    password = models.CharField(max_length=200, null=True)
     type = models.CharField(max_length=1, null=False)
     user = models.ForeignKey(User, related_name='pool', on_delete=models.CASCADE)
     sais = models.ManyToManyField(Sai, related_name='sais_pools')#<- Un POOL puede tener muchos SAIS y un SAI puede tener muchos POOLS
@@ -35,6 +39,9 @@ class Pool(models.Model):
 
         session = sessions.get(self.cache_key)
         if not session:
-            session = conection(url=self.url, user=self.username, hipervisor_type=self.type)
+            # Desencriptamos la clave
+            semilla = get_env_setting('SEMILLA')
+            password_decoded = cryptocode.decrypt(self.password, semilla)
+            session = conection(url=self.url, user=self.username, hipervisor_type=self.type, password=password_decoded)
             sessions[self.cache_key] = session
         return session

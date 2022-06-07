@@ -20,3 +20,13 @@
             localtime = time.localtime()
             result = time.strftime("%I:%M:%S %p", localtime)
             print('Este es el sai 2 HORA--> '+ result)
+
+
+
+  DECORIFICAR CONTRASEÑA __________
+
+                semilla = get_env_setting('SEMILLA')
+                pooltest = Pool.objects.get(ip='10.10.10.7')
+                password_encoded = pooltest.password
+                str_decoded = cryptocode.decrypt(password_encoded, semilla)
+                print(str_decoded)

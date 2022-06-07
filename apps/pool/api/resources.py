@@ -4,12 +4,15 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 
-from apps.host.models import Host
+from apps.backend.utils import get_env_setting
+from apps.host.models import Host, HostSai
 from apps.pool.api.serializers import PoolSerializer
 
 from apps.backend.hipervisor_api.xenapi import conection
 from apps.pool.models import Pool
 from apps.sai.models import Sai
+
+import cryptocode
 
 
 class PoolViewSet(viewsets.ModelViewSet):
@@ -40,13 +43,19 @@ class PoolViewSet(viewsets.ModelViewSet):
                     namePool = request.data['name_pool']
                     url = request.data['url']
                     username = request.data['username']
+                    password = request.data['password']
                     typeHipervisor = request.data['type']
                     user = request.data['user']
                     sais = request.data['sais']
 
-                    isConnected = conection(url=url, user=username, hipervisor_type=typeHipervisor)
+                    isConnected = conection(url=url, user=username, hipervisor_type=typeHipervisor, password=password)
 
                     if isConnected:
+                        semilla = get_env_setting('SEMILLA')
+
+                        #Cifrar contraseña
+                        password_encoded = cryptocode.encrypt(password, semilla)
+
                         idNewPool = ''
                         pool = isConnected.xenapi.pool.get_all()[0]
 
@@ -62,6 +71,7 @@ class PoolViewSet(viewsets.ModelViewSet):
                                                ip=recordPif['IP'],
                                                url=url,
                                                username=username,
+                                               password=password_encoded,
                                                type=typeHipervisor,
                                                user_id=user)
 
@@ -81,6 +91,12 @@ class PoolViewSet(viewsets.ModelViewSet):
                                                      pool_id=objPool.id,
                                                      user_id=user)
                                 objHostMaster.save()
+
+                                # Agregamos la relacion muchos a muchos (los sais al host)
+                                for idSai in sais:
+                                    sai = Sai.objects.get(id=idSai)
+                                    m1 = HostSai(host=objHostMaster, sai=sai, enchufado=True)
+                                    m1.save()
 
                         # <-- O T R O S - H O S T S -->>
                         hosts = isConnected.xenapi.host.get_all()
@@ -113,6 +129,7 @@ class PoolViewSet(viewsets.ModelViewSet):
             pool_serializer = self.serializer_class(self.get_queryset(pk), data=request.data)
             if pool_serializer.is_valid():
                 pool_serializer.save()
+
                 # return Response(pool_serializer.data, status=status.HTTP_200_OK)
                 return Response('Updated-OK', status=status.HTTP_200_OK)
             return Response(pool_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -143,10 +160,15 @@ class syncPool(APIView):
             idPool = request.data['id']
             url = request.data['url']
             username = request.data['username']
+            password = request.data['password']
             typeHipervisor = request.data['type']
             user = request.data['user']
 
-            isConnected = conection(url=url, user=username, hipervisor_type=typeHipervisor)
+            #Desencriptamos la clave
+            semilla = get_env_setting('SEMILLA')
+            password_decoded = cryptocode.decrypt(password, semilla)
+
+            isConnected = conection(url=url, user=username, hipervisor_type=typeHipervisor, password=password_decoded)
 
             if isConnected:
                 # Eliminamos todos los Hosts del Pool

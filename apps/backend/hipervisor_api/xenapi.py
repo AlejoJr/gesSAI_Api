@@ -3,15 +3,15 @@ from XenAPI import XenAPI
 from apps.backend.utils import get_env_setting
 
 
-def conection(url, user, hipervisor_type):
+def conection(url, user, hipervisor_type, password):
 
     try:
-        password = get_env_setting('XENAPI_PASS')
+        #password = get_env_setting('XENAPI_PASS')
         #Conexion Xen
         if hipervisor_type == 'X':
             session = XenAPI.Session(url)
             session.login_with_password(user, password)
-            print('Session Ref: ' + session._session)
+            print('Conexión OK - Session Ref: ' + session._session)
             return session
 
         # Conexion Ovirt
